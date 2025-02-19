@@ -1,0 +1,389 @@
+{
+	"info": {
+		"_postman_id": "fe85e287-8d01-438b-89e6-747ccf965593",
+		"name": "Blog API endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26858746",
+		"_collection_link": "https://orange-station-935503.postman.co/workspace/Teste-Postman~288b0239-1608-49e5-ac91-ad752dd09eee/collection/26858746-fe85e287-8d01-438b-89e6-747ccf965593?action=share&source=collection_link&creator=26858746"
+	},
+	"item": [
+		{
+			"name": "Register a new user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const email = `michael.${new Date().getTime()}@email.com`\r",
+							"pm.collectionVariables.set('userEmail',email)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('it should register a new user with vslid data',() => {\r",
+							"    pm.response.to.have.status(201)\r",
+							"    const {user} = pm.response.json()\r",
+							"    pm.expect(user).to.not.null\r",
+							"    pm.expect(user.id).to.greaterThan(0)\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Michael Felipe\",\r\n  \"email\": \"{{userEmail}}\",\r\n  \"password\": \"Senha12345\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/users",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register a user with invalid data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('it should not register a user with an ínvalid password',() => {\r",
+							"    pm.response.to.have.status(400)\r",
+							"    const { messages } = pm.response.json()\r",
+							"    pm.expect(messages[0]).to.equal('Password must contain at least 8 characters, 1 uppercase character, and 1 digit')\r",
+							"})\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Michael Felipe\",\r\n  \"email\": \"mic@email.com\",\r\n  \"password\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/users",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authenticate a user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const { authorized, token } = pm.response.json()\r",
+							"pm.collectionVariables.set('token', token)\r",
+							"\r",
+							"pm.test('it should authenticate a user with valid credentials', () => {\r",
+							"    pm.response.to.have.status(200)\r",
+							"    pm.expect(authorized).to.equal(true)\r",
+							"    pm.expect(token).to.have.length.greaterThan(0)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n     \"email\": \"{{userEmail}}\",\r\n     \"password\": \"Senha12345\"\r\n\r\n }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/users/login",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register a new post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							" const {post} = pm.response.json()\r",
+							" pm.collectionVariables.set('postId', post.id)\r",
+							"\r",
+							"pm.test('it should register a new post with valid data ',() => {\r",
+							"    pm.response.to.have.status(201)\r",
+							"    pm.expect(post).to.not.null\r",
+							"    pm.expect(post.id).to.greaterThan(0)\r",
+							"    \r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Learning programming with Go\",\r\n  \"content\": \"Go is a very popular programming language, which is great for learning programming logics.\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/posts",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieves a post by its id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('it should retrieve a previously registered post by its id',() => {\r",
+							"    pm.response.to.have.status(200)\r",
+							"    const {post} = pm.response.json()\r",
+							"    pm.expect(post).to.not.null\r",
+							"    const postId = pm.collectionVariables.get('postId')\r",
+							"    pm.expect(post.id).to.equals(postId)\r",
+							"    \r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/posts/{{postId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"posts",
+						"{{postId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletes a post by its id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('it should delete a previously registered post by its id', () =>{\r",
+							"    pm.response.to.have.status(200)\r",
+							"    const  {message} = pm.response.json()\r",
+							"    pm.expect(message).to.equal('Post deleted')\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/posts/{{postId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"posts",
+						"{{postId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a user by email",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('it should delete a previously registered user by its email', ()=>{\r",
+							"    pm.response.to.have.status(200)\r",
+							"    const {message} = pm.response.json()\r",
+							"    pm.expect(message).to.equal('User deleted')\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/users/{{userEmail}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"users",
+						"{{userEmail}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "userEmail",
+			"value": ""
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "postId",
+			"value": ""
+		}
+	]
+}
